@@ -2,7 +2,7 @@
 
 Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal en .NET.
 
-PAN.Mediator es un reemplazo propio y desde cero de MediatR (creado porque MediatR pasó a licencia paga). Apunta a paridad de superficie de API con MediatR — `Send`/`Publish`, pipeline behaviors, `Unit`, y una extensión de registro DI estilo `AddXMediator` — para que una app que hoy envuelve MediatR pueda migrar cambiando `using`s y la referencia de paquete, no reescribiendo handlers.
+PAN.Mediator es un reemplazo propio y desde cero de MediatR. Apunta a paridad de superficie de API con MediatR — `Send`/`Publish`, pipeline behaviors, `Unit`, y una extensión de registro DI estilo `AddXMediator` — para que una app que hoy envuelve MediatR pueda migrar cambiando `using`s y la referencia de paquete, no reescribiendo handlers.
 
 Multi-target: `netstandard2.0`, `net6.0`, `net8.0`.
 
