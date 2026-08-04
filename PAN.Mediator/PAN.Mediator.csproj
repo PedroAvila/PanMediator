@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+
+    <!-- Tus datos para NuGet -->
+    <PackageId>PAN.Mediator</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Pedro Avila</Authors>
+    <Description>Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal.</Description>
+    <PackageTags>mediator;cqrs;hexagonal;pan</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

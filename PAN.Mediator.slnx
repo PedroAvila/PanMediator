@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PAN.Mediator/PAN.Mediator.csproj" />
+  <Project Path="tests/PAN.Mediator.Tests/PAN.Mediator.Tests.csproj" />
+</Solution>
