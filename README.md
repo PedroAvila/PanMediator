@@ -6,6 +6,8 @@ PAN.Mediator es un reemplazo propio y desde cero de MediatR. Apunta a paridad de
 
 Multi-target: `netstandard2.0`, `net6.0`, `net8.0`.
 
+Prueba de uso de la librería: [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
+
 ## Instalación
 
 ```bash
@@ -183,4 +185,4 @@ dotnet test tests/PAN.Mediator.Tests/PAN.Mediator.Tests.csproj
 dotnet test tests/PAN.Mediator.Tests/PAN.Mediator.Tests.csproj --filter "DisplayName~Send_returns_the_handlers_response"
 ```
 
-No hay una aplicación consumidora en este repo — se desarrolla y testea de forma independiente.
+No hay una aplicación consumidora en este repo — se desarrolla y testea de forma independiente. La prueba de uso de la librería está en [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
