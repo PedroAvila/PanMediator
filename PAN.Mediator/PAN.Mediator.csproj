@@ -6,13 +6,23 @@
     <Nullable>enable</Nullable>
     <LangVersion>10.0</LangVersion>
 
-    <!-- Tus datos para NuGet -->
+    <!-- Datos para NuGet -->
     <PackageId>PAN.Mediator</PackageId>
     <Version>1.0.0</Version>
     <Authors>Pedro Avila</Authors>
-    <Description>Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal.</Description>
-    <PackageTags>mediator;cqrs;hexagonal;pan</PackageTags>
+    <Description>Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal en .NET. Reemplazo de MediatR con paridad de API (Send/Publish, pipeline behaviors, Unit) y estrategias de publish pluggables.</Description>
+    <PackageTags>mediator;cqrs;hexagonal;pan;pipeline;behavior;notification</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/PedroAvila/PanMediator</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/PedroAvila/PanMediator.git</RepositoryUrl>
+    <PackageReleaseNotes>Primera versión: Send/Publish, pipeline behaviors, Unit, estrategias de publish secuencial y paralela, registro DI via AddPanMediator.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />

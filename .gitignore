@@ -37,6 +37,7 @@ coverage/
 *.exe
 *.cache
 *.log
+artifacts/
 
 # OS files
 .DS_Store
