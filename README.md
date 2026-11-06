@@ -16,7 +16,7 @@ dotnet add package PAN.Mediator
 
 ## Requirements
 
-- .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net8.0`.
+- .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net10.0`.
 - `Microsoft.Extensions.DependencyInjection` (or any container compatible with `IServiceProvider`).
 
 ## Quick start
