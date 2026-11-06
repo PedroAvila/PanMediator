@@ -1,27 +1,27 @@
 # PAN.Mediator
 
-Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal en .NET.
+Immutable, lightweight, and native mediator for CQRS and Hexagonal Architecture in .NET.
 
-PAN.Mediator es un reemplazo propio y desde cero de MediatR. Apunta a paridad de superficie de API con MediatR — `Send`/`Publish`, pipeline behaviors, `Unit`, y una extensión de registro DI estilo `AddXMediator` — para que una app que hoy envuelve MediatR pueda migrar cambiando `using`s y la referencia de paquete, no reescribiendo handlers.
+PAN.Mediator is a from-scratch, self-owned replacement for MediatR. It targets API-surface parity with MediatR — `Send`/`Publish`, pipeline behaviors, `Unit`, and an `AddXMediator`-style DI registration extension — so that an app wrapping MediatR today can migrate by changing `using`s and the package reference, not by rewriting handlers.
 
 Multi-target: `netstandard2.0`, `net6.0`, `net8.0`.
 
-Prueba de uso de la librería: [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
+Library usage sample: [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
 
-## Instalación
+## Installation
 
 ```bash
 dotnet add package PAN.Mediator
 ```
 
-## Requisitos
+## Requirements
 
-- .NET SDK compatible con `netstandard2.0`, `net6.0` o `net8.0`.
-- `Microsoft.Extensions.DependencyInjection` (o cualquier contenedor compatible con `IServiceProvider`).
+- .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net8.0`.
+- `Microsoft.Extensions.DependencyInjection` (or any container compatible with `IServiceProvider`).
 
-## Uso rápido
+## Quick start
 
-### 1. Registrar el mediador
+### 1. Register the mediator
 
 ```csharp
 services.AddPanMediator(config =>
@@ -31,9 +31,9 @@ services.AddPanMediator(config =>
 });
 ```
 
-`RegisterServicesFromAssembly`/`RegisterServicesFromAssemblies` escanean el assembly y registran automáticamente cualquier `IPanRequestHandler<,>` e `IPanNotificationHandler<>` concreto (incluso `internal`).
+`RegisterServicesFromAssembly`/`RegisterServicesFromAssemblies` scan the assembly and automatically register any concrete `IPanRequestHandler<,>` and `IPanNotificationHandler<>` (including `internal` ones).
 
-Lifetimes configurables (todos `Transient` por defecto):
+Configurable lifetimes (all `Transient` by default):
 
 ```csharp
 config.MediatorLifetime = ServiceLifetime.Scoped;
@@ -41,7 +41,7 @@ config.HandlerLifetime = ServiceLifetime.Scoped;
 config.BehaviorLifetime = ServiceLifetime.Scoped;
 ```
 
-### 2. Definir un request y su handler
+### 2. Define a request and its handler
 
 ```csharp
 public sealed class PingRequest : IPanRequest<string>
@@ -56,7 +56,7 @@ public sealed class PingRequestHandler : IPanRequestHandler<PingRequest, string>
 }
 ```
 
-Para requests sin respuesta significativa, usar la forma de conveniencia basada en `Unit` (equivalente a `void` async):
+For requests with no meaningful response, use the `Unit`-based convenience form (equivalent to async `void`):
 
 ```csharp
 public sealed class DeleteUserCommand : IPanRequest { }
@@ -71,7 +71,7 @@ public sealed class DeleteUserHandler : IPanRequestHandler<DeleteUserCommand>
 }
 ```
 
-### 3. Enviar el request
+### 3. Send the request
 
 ```csharp
 public sealed class MyService(IPanMediator mediator)
@@ -97,11 +97,11 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPanPipelineBehavior<
 }
 ```
 
-Registrar con `config.AddOpenBehavior(typeof(LoggingBehavior<,>))` (genérico abierto, aplica a todos los requests) o `config.AddBehavior<MySpecificBehavior>()` (un tipo concreto).
+Register with `config.AddOpenBehavior(typeof(LoggingBehavior<,>))` (open generic, applies to all requests) or `config.AddBehavior<MySpecificBehavior>()` (a concrete type).
 
-**El orden de registro importa**: el primer behavior registrado queda más "afuera" en la cadena. Si registrás `ValidationBehavior` y después `LoggingBehavior`, `LoggingBehavior` envuelve a `ValidationBehavior`, que envuelve al handler.
+**Registration order matters**: the first registered behavior ends up outermost in the chain. If you register `ValidationBehavior` and then `LoggingBehavior`, `LoggingBehavior` wraps `ValidationBehavior`, which wraps the handler.
 
-### 5. Notificaciones (pub/sub)
+### 5. Notifications (pub/sub)
 
 ```csharp
 public sealed class UserCreatedNotification : IPanNotification
@@ -113,7 +113,7 @@ public sealed class SendWelcomeEmailHandler : IPanNotificationHandler<UserCreate
 {
     public Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
     {
-        // enviar email...
+        // send email...
         return Task.CompletedTask;
     }
 }
@@ -123,18 +123,18 @@ public sealed class SendWelcomeEmailHandler : IPanNotificationHandler<UserCreate
 await mediator.Publish(new UserCreatedNotification { Email = "user@example.com" });
 ```
 
-Zero handlers registrados es un no-op, no un error. Por defecto los handlers se ejecutan secuencialmente en orden de registro (ver siguiente sección para hacerlo configurable).
+Zero registered handlers is a no-op, not an error. By default handlers run sequentially in registration order (see the next section to make it configurable).
 
-## Novedad: estrategias de Publish configurables
+## New: configurable Publish strategies
 
-A diferencia de MediatR clásico, en PAN.Mediator la forma en que `Publish` invoca a los handlers de una notificación es **pluggable** vía `IPanNotificationPublishStrategy<TNotification>`, sin cambiar el contrato de `IPanMediator`, `IPanNotification` ni `IPanNotificationHandler<T>`.
+Unlike classic MediatR, in PAN.Mediator the way `Publish` invokes a notification's handlers is **pluggable** via `IPanNotificationPublishStrategy<TNotification>`, without changing the `IPanMediator`, `IPanNotification`, or `IPanNotificationHandler<T>` contracts.
 
-Vienen dos estrategias listas para usar:
+Two ready-to-use strategies ship with the library:
 
-- **`SequentialNotificationPublishStrategy<T>`** (default, sin configurar nada): invoca los handlers uno por uno, en orden de registro. Si uno tira una excepción, los siguientes no se ejecutan — es el comportamiento original.
-- **`ParallelWhenAllNotificationPublishStrategy<T>`**: arranca todos los handlers a la vez y espera a que todos terminen con `Task.WhenAll`, aunque alguno falle. Útil cuando los handlers son independientes (ej. notificar a varios sistemas externos) y no querés que uno lento o roto bloquee al resto.
+- **`SequentialNotificationPublishStrategy<T>`** (default, no configuration needed): invokes handlers one by one, in registration order. If one throws, the following ones do not run — this is the original behavior.
+- **`ParallelWhenAllNotificationPublishStrategy<T>`**: starts all handlers at once and waits for all of them to finish with `Task.WhenAll`, even if one fails. Useful when handlers are independent (e.g. notifying several external systems) and you don't want one slow or broken handler to block the rest.
 
-### Cómo activarla
+### How to enable it
 
 ```csharp
 services.AddPanMediator(config =>
@@ -144,11 +144,11 @@ services.AddPanMediator(config =>
 });
 ```
 
-Se registra como genérico abierto — igual que los pipeline behaviors — y aplica a todos los tipos de notificación del proceso. Si nunca se llama a `UseNotificationPublishStrategy`, el comportamiento es idéntico al de siempre (secuencial), así que no rompe código existente.
+It is registered as an open generic — just like pipeline behaviors — and applies to all notification types in the process. If `UseNotificationPublishStrategy` is never called, the behavior is identical to the usual one (sequential), so it does not break existing code.
 
-### Estrategia propia
+### Custom strategy
 
-También podés implementar tu propia estrategia (por ejemplo, para tolerar fallos, aplicar timeouts por handler, o loggear el fan-out):
+You can also implement your own strategy (for example, to tolerate failures, apply per-handler timeouts, or log the fan-out):
 
 ```csharp
 public sealed class MyCustomPublishStrategy<TNotification> : IPanNotificationPublishStrategy<TNotification>
@@ -159,7 +159,7 @@ public sealed class MyCustomPublishStrategy<TNotification> : IPanNotificationPub
         IEnumerable<IPanNotificationHandler<TNotification>> handlers,
         CancellationToken cancellationToken)
     {
-        // tu lógica de fan-out
+        // your fan-out logic
     }
 }
 ```
@@ -168,21 +168,21 @@ public sealed class MyCustomPublishStrategy<TNotification> : IPanNotificationPub
 config.UseNotificationPublishStrategy(typeof(MyCustomPublishStrategy<>));
 ```
 
-## Fuera de alcance (v1)
+## Out of scope (v1)
 
-Streaming requests (`IStreamRequest`), pre/post processors y exception-handling middleware no están implementados — solo `Send`, `Publish` y pipeline behaviors. Tampoco hay overloads no genéricos `Send(object)`/`Publish(object)`.
+Streaming requests (`IStreamRequest`), pre/post processors, and exception-handling middleware are not implemented — only `Send`, `Publish`, and pipeline behaviors. There are also no non-generic `Send(object)`/`Publish(object)` overloads.
 
-## Desarrollo
+## Development
 
 ```bash
-# Compilar los tres target frameworks
+# Build all three target frameworks
 dotnet build PAN.Mediator.slnx
 
-# Correr toda la suite de tests
+# Run the full test suite
 dotnet test tests/PAN.Mediator.Tests/PAN.Mediator.Tests.csproj
 
-# Correr un test puntual
+# Run a single test
 dotnet test tests/PAN.Mediator.Tests/PAN.Mediator.Tests.csproj --filter "DisplayName~Send_returns_the_handlers_response"
 ```
 
-No hay una aplicación consumidora en este repo — se desarrolla y testea de forma independiente. La prueba de uso de la librería está en [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
+There is no consuming application in this repo — it is developed and tested independently. The library usage sample is at [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
