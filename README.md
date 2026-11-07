@@ -4,7 +4,7 @@ Immutable, lightweight, and native mediator for CQRS and Hexagonal Architecture 
 
 PAN.Mediator is a from-scratch, self-owned replacement for MediatR. It targets API-surface parity with MediatR — `Send`/`Publish`, pipeline behaviors, `Unit`, and an `AddXMediator`-style DI registration extension — so that an app wrapping MediatR today can migrate by changing `using`s and the package reference, not by rewriting handlers.
 
-Multi-target: `netstandard2.0`, `net6.0`, `net8.0`. The NuGet package also ships a Roslyn source generator that emits a compile-time dispatch chain for your concrete requests (falling back to reflection only for unknown request types).
+Multi-target: `netstandard2.0`, `net6.0`, `net8.0`, `net10.0`. The NuGet package also ships a Roslyn source generator that emits a compile-time dispatch chain for your concrete requests (falling back to reflection only for unknown request types).
 
 Library usage sample: [PanMediatorPrueba](https://github.com/PedroAvila/PanMediatorPrueba).
 
@@ -48,7 +48,7 @@ dotnet add package PAN.Mediator
 
 ## Requirements
 
-- .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net8.0`.
+- .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net8.0`, `net10.0`.
 - `Microsoft.Extensions.DependencyInjection` (or any container compatible with `IServiceProvider`).
 
 The `netstandard2.0` build can be consumed from .NET Framework — see [WebApiMediator](https://github.com/PedroAvila/WebApiMediator) for a working Web API sample targeting .NET Framework.
