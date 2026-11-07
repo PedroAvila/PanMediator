@@ -8,7 +8,7 @@
 
     <!-- Datos para NuGet -->
     <PackageId>PAN.Mediator</PackageId>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Pedro Avila</Authors>
     <Description>Mediador inmutable, ligero y nativo para CQRS y Arquitectura Hexagonal en .NET. Reemplazo de MediatR con paridad de API (Send/Publish, pipeline behaviors, Unit) y estrategias de publish pluggables.</Description>
     <PackageTags>mediator;cqrs;hexagonal;pan;pipeline;behavior;notification</PackageTags>
@@ -17,7 +17,7 @@
     <PackageProjectUrl>https://github.com/PedroAvila/PanMediator</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/PedroAvila/PanMediator.git</RepositoryUrl>
-    <PackageReleaseNotes>Primera versión: Send/Publish, pipeline behaviors, Unit, estrategias de publish secuencial y paralela, registro DI via AddPanMediator.</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.0.0: source generator Roslyn con dispatch monomórfico en tiempo de compilación y fallback reflexivo; API pública migrada a ValueTask/ValueTask&lt;T&gt; (cambio breaking); optimizaciones de hot path con fast paths para 0/1 behaviors y 0/1 handlers; analyzer incluido en el paquete y auto-registro del mediador generado en AddPanMediator.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
