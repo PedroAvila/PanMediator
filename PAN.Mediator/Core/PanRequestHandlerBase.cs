@@ -28,24 +28,45 @@ namespace PAN.Mediator.Core
         {
             var typedRequest = (TRequest)request;
 
-            PanRequestHandlerDelegate<TResponse> handlerDelegate = () =>
-            {
-                var handler = (IPanRequestHandler<TRequest, TResponse>)provider.GetRequiredService(typeof(IPanRequestHandler<TRequest, TResponse>));
-                return handler.Handle(typedRequest, cancellationToken);
-            };
+            var behaviors = provider.GetServices<IPanPipelineBehavior<TRequest, TResponse>>();
 
-            var behaviors = (IEnumerable<IPanPipelineBehavior<TRequest, TResponse>>)
-                provider.GetServices(typeof(IPanPipelineBehavior<TRequest, TResponse>));
-
-            // First-registered behavior ends up outermost in the chain.
-            foreach (var behavior in behaviors.Reverse())
+            IReadOnlyList<IPanPipelineBehavior<TRequest, TResponse>> behaviorList;
+            if (behaviors is IReadOnlyList<IPanPipelineBehavior<TRequest, TResponse>> list)
             {
-                var next = handlerDelegate;
-                var currentBehavior = behavior;
-                handlerDelegate = () => currentBehavior.Handle(typedRequest, next, cancellationToken);
+                behaviorList = list;
+            }
+            else
+            {
+                behaviorList = new List<IPanPipelineBehavior<TRequest, TResponse>>(behaviors);
             }
 
-            return handlerDelegate();
+            var count = behaviorList.Count;
+
+            // No behaviors: invoke the handler directly (no delegate or closure allocated).
+            if (count == 0)
+            {
+                return provider
+                    .GetRequiredService<IPanRequestHandler<TRequest, TResponse>>()
+                    .Handle(typedRequest, cancellationToken);
+            }
+
+            // Resolve the handler lazily so a short-circuiting behavior never forces resolution.
+            PanRequestHandlerDelegate<TResponse> next = () =>
+                provider
+                    .GetRequiredService<IPanRequestHandler<TRequest, TResponse>>()
+                    .Handle(typedRequest, cancellationToken);
+
+            // First-registered behavior ends up outermost: fold from the last behavior down to
+            // index 1, then invoke behavior[0] directly. This avoids LINQ Reverse(), its buffer,
+            // and one extra closure/delegate invocation per call.
+            for (var i = count - 1; i >= 1; i--)
+            {
+                var current = next;
+                var behavior = behaviorList[i];
+                next = () => behavior.Handle(typedRequest, current, cancellationToken);
+            }
+
+            return behaviorList[0].Handle(typedRequest, next, cancellationToken);
         }
     }
 }

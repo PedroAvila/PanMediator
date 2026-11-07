@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,36 @@ namespace PAN.Mediator.Notifications
     public sealed class SequentialNotificationPublishStrategy<TNotification> : IPanNotificationPublishStrategy<TNotification>
         where TNotification : IPanNotification
     {
-        public async Task Publish(
+        public Task Publish(
+            TNotification notification,
+            IEnumerable<IPanNotificationHandler<TNotification>> handlers,
+            CancellationToken cancellationToken
+        )
+        {
+            if (handlers is IReadOnlyList<IPanNotificationHandler<TNotification>> list)
+            {
+                if (list.Count == 0)
+                {
+                    return Task.CompletedTask;
+                }
+
+                if (list.Count == 1)
+                {
+                    try
+                    {
+                        return list[0].Handle(notification, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        return Task.FromException(ex);
+                    }
+                }
+            }
+
+            return PublishSequential(notification, handlers, cancellationToken);
+        }
+
+        private static async Task PublishSequential(
             TNotification notification,
             IEnumerable<IPanNotificationHandler<TNotification>> handlers,
             CancellationToken cancellationToken

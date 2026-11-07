@@ -19,24 +19,30 @@ namespace PAN.Mediator.Core
         private static readonly IPanNotificationPublishStrategy<TNotification> DefaultStrategy =
             new SequentialNotificationPublishStrategy<TNotification>();
 
-        public override async Task Handle(
+        public override Task Handle(
             object notification,
             IServiceProvider provider,
             CancellationToken cancellationToken
         )
         {
-            var typedNotification = (TNotification)notification;
+            try
+            {
+                var typedNotification = (TNotification)notification;
 
-            var handlers =
-                (IEnumerable<IPanNotificationHandler<TNotification>>)
-                    provider.GetServices(typeof(IPanNotificationHandler<TNotification>));
+                var handlers = provider.GetServices<IPanNotificationHandler<TNotification>>();
 
-            var strategy =
-                (IPanNotificationPublishStrategy<TNotification>?)
-                    provider.GetService(typeof(IPanNotificationPublishStrategy<TNotification>))
-                ?? DefaultStrategy;
+                var strategy =
+                    provider.GetService<IPanNotificationPublishStrategy<TNotification>>()
+                    ?? DefaultStrategy;
 
-            await strategy.Publish(typedNotification, handlers, cancellationToken).ConfigureAwait(false);
+                return strategy.Publish(typedNotification, handlers, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Preserve the previous async wrapper's behavior: synchronous failures surface as a
+                // faulted Task instead of throwing from Publish.
+                return Task.FromException(ex);
+            }
         }
     }
 }

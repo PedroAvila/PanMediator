@@ -22,7 +22,7 @@ namespace PAN.Mediator.Core
             if (request is null) throw new ArgumentNullException(nameof(request));
 
             var requestType = request.GetType();
-            var wrapper = (PanRequestHandlerWrapper<TResponse>)RequestHandlers.GetOrAdd(requestType, type =>
+            var wrapper = (PanRequestHandlerWrapper<TResponse>)RequestHandlers.GetOrAdd(requestType, static type =>
             {
                 var wrapperType = typeof(PanRequestHandlerWrapperImpl<,>).MakeGenericType(type, typeof(TResponse));
                 return (PanRequestHandlerBase)Activator.CreateInstance(wrapperType)!;

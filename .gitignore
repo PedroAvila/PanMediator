@@ -31,6 +31,9 @@ coverage/
 !**/packages/build/
 .nuget/
 
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
+
 # Build artifacts
 *.dll
 *.pdb
