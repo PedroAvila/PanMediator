@@ -28,6 +28,27 @@ namespace PAN.Mediator.Tests
         }
 
         [Fact]
+        public async Task AddPanMediator_prefers_the_source_generated_mediator_when_available()
+        {
+            var services = new ServiceCollection();
+
+            services.AddPanMediator(config =>
+            {
+                config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            });
+
+            var provider = services.BuildServiceProvider();
+            var mediator = provider.GetRequiredService<IPanMediator>();
+
+            Assert.Equal("PAN.Mediator.Generated.GeneratedPanMediator", mediator.GetType().FullName);
+
+            Assert.Equal("Pong: generated", await mediator.Send(new PingRequest { Message = "generated" }));
+            Assert.Equal(Unit.Value, await mediator.Send(new VoidRequest()));
+
+            await mediator.Publish(new PingNotification { Message = "generated" });
+        }
+
+        [Fact]
         public async Task AddPanMediator_registers_open_behaviors_and_notification_handlers_from_scanning()
         {
             var services = new ServiceCollection();

@@ -17,12 +17,25 @@ namespace PAN.Mediator.DependencyInjection
             var configuration = new PanMediatorServiceConfiguration();
             configure(configuration);
 
-            services.Add(new ServiceDescriptor(typeof(IPanMediator), typeof(PanMediator), configuration.MediatorLifetime));
-
             foreach (var assembly in configuration.AssembliesToRegister)
             {
                 HandlerRegistrar.RegisterHandlersFromAssembly(services, assembly, configuration.HandlerLifetime);
             }
+
+            // One-time (container-build) discovery: prefer the source-generated dispatcher emitted into
+            // a scanned assembly, falling back to the reflection-based implementation otherwise.
+            var mediatorType = typeof(PanMediator);
+            foreach (var assembly in configuration.AssembliesToRegister)
+            {
+                var generated = assembly.GetType("PAN.Mediator.Generated.GeneratedPanMediator", throwOnError: false);
+                if (generated is not null && !generated.IsAbstract && typeof(IPanMediator).IsAssignableFrom(generated))
+                {
+                    mediatorType = generated;
+                    break;
+                }
+            }
+
+            services.Add(new ServiceDescriptor(typeof(IPanMediator), mediatorType, configuration.MediatorLifetime));
 
             // Registration order is preserved: the first AddOpenBehavior/AddBehavior call ends up outermost in the pipeline.
             foreach (var behaviorType in configuration.BehaviorsToRegister)

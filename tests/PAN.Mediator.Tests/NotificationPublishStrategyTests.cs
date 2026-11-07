@@ -77,7 +77,7 @@ namespace PAN.Mediator.Tests
 
             // Sequential would stop after the first throwing handler; ParallelWhenAll starts every
             // handler up front, so the handler registered after the first throw still runs.
-            await Assert.ThrowsAnyAsync<Exception>(() => mediator.Publish(notification));
+            await Assert.ThrowsAnyAsync<Exception>(() => mediator.Publish(notification).AsTask());
             await middleHandler.Received(1).Handle(notification, Arg.Any<CancellationToken>());
         }
 

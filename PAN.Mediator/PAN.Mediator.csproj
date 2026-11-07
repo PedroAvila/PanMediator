@@ -25,7 +25,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Build the generator before pack, but do not reference or analyze this project with it. -->
+    <ProjectReference Include="..\PAN.Mediator.SourceGenerators\PAN.Mediator.SourceGenerators.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <!-- Ship the generator inside the package so consumers get it automatically. -->
+    <None Include="..\PAN.Mediator.SourceGenerators\bin\$(Configuration)\netstandard2.0\PAN.Mediator.SourceGenerators.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
 </Project>

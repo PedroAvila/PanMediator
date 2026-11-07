@@ -49,14 +49,14 @@ namespace PAN.Mediator.Tests
             var provider = services.BuildServiceProvider();
             var mediator = provider.GetRequiredService<IPanMediator>();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => mediator.Send(new PingRequest { Message = "hi" }));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => mediator.Send(new PingRequest { Message = "hi" }).AsTask());
         }
 
         [Fact]
         public async Task Behavior_that_does_not_call_next_short_circuits_the_handler()
         {
             var handler = Substitute.For<IPanRequestHandler<PingRequest, string>>();
-            handler.Handle(Arg.Any<PingRequest>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult("real"));
+            handler.Handle(Arg.Any<PingRequest>(), Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("real"));
 
             var services = new ServiceCollection();
             services.AddSingleton(handler);

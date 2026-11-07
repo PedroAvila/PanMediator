@@ -7,7 +7,10 @@ namespace PAN.Mediator.Abstractions
     public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     {
         public static readonly Unit Value = new Unit();
-        public static readonly Task<Unit> Task = System.Threading.Tasks.Task.FromResult(Value);
+
+        // Property (not a static field): ValueTask<T> embeds a T, so a static ValueTask<Unit> field
+        // inside Unit creates a circular layout dependency that the CLR type loader rejects.
+        public static ValueTask<Unit> CompletedValueTask => new ValueTask<Unit>(Value);
 
         public bool Equals(Unit other) => true;
 

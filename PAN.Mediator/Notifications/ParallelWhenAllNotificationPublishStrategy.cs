@@ -16,7 +16,7 @@ namespace PAN.Mediator.Notifications
     public sealed class ParallelWhenAllNotificationPublishStrategy<TNotification> : IPanNotificationPublishStrategy<TNotification>
         where TNotification : IPanNotification
     {
-        public Task Publish(
+        public ValueTask Publish(
             TNotification notification,
             IEnumerable<IPanNotificationHandler<TNotification>> handlers,
             CancellationToken cancellationToken
@@ -28,7 +28,7 @@ namespace PAN.Mediator.Notifications
                 Task task;
                 try
                 {
-                    task = handler.Handle(notification, cancellationToken);
+                    task = handler.Handle(notification, cancellationToken).AsTask();
                 }
                 catch (Exception ex)
                 {
@@ -40,7 +40,7 @@ namespace PAN.Mediator.Notifications
                 tasks.Add(task);
             }
 
-            return tasks.Count == 0 ? Task.CompletedTask : Task.WhenAll(tasks);
+            return tasks.Count == 0 ? default : new ValueTask(Task.WhenAll(tasks));
         }
     }
 }

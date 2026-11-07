@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 namespace PAN.Mediator.Abstractions
 {
     public interface IPanRequestHandler<in TRequest, TResponse>
-        where TRequest : IPanRequest<TResponse>
     {
-        Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
+        ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
     }
 
     /// <summary>Convenience form for requests with no meaningful response (Unit).</summary>

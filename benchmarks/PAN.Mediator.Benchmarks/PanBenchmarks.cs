@@ -46,13 +46,13 @@ public class PanSendBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public Task<string> Direct_Handler() => _handler.Handle(_request, default);
+    public ValueTask<string> Direct_Handler() => _handler.Handle(_request, default);
 
     [Benchmark]
-    public Task<string> Send_Transient() => _transientMediator.Send(_request, default);
+    public ValueTask<string> Send_Transient() => _transientMediator.Send(_request, default);
 
     [Benchmark]
-    public Task<string> Send_Singleton() => _singletonMediator.Send(_request, default);
+    public ValueTask<string> Send_Singleton() => _singletonMediator.Send(_request, default);
 }
 
 [MemoryDiagnoser]
@@ -99,13 +99,13 @@ public class PanSendWithBehaviorBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public Task<string> Direct_Handler() => _handler.Handle(_request, default);
+    public ValueTask<string> Direct_Handler() => _handler.Handle(_request, default);
 
     [Benchmark]
-    public Task<string> Send_Transient() => _transientMediator.Send(_request, default);
+    public ValueTask<string> Send_Transient() => _transientMediator.Send(_request, default);
 
     [Benchmark]
-    public Task<string> Send_Singleton() => _singletonMediator.Send(_request, default);
+    public ValueTask<string> Send_Singleton() => _singletonMediator.Send(_request, default);
 }
 
 [MemoryDiagnoser]
@@ -134,11 +134,11 @@ public class PanPublishBenchmarks
     public void Cleanup() => _provider.Dispose();
 
     [Benchmark(Baseline = true)]
-    public Task Direct_Single() => _singleHandler.Handle(PanSingleNotification.Instance, default);
+    public ValueTask Direct_Single() => _singleHandler.Handle(PanSingleNotification.Instance, default);
 
     [Benchmark]
-    public Task Publish_Single() => _mediator.Publish(PanSingleNotification.Instance, default);
+    public ValueTask Publish_Single() => _mediator.Publish(PanSingleNotification.Instance, default);
 
     [Benchmark]
-    public Task Publish_Three() => _mediator.Publish(PanThreeNotifications.Instance, default);
+    public ValueTask Publish_Three() => _mediator.Publish(PanThreeNotifications.Instance, default);
 }

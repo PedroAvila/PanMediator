@@ -13,7 +13,7 @@ namespace PAN.Mediator.Notifications
     public interface IPanNotificationPublishStrategy<TNotification>
         where TNotification : IPanNotification
     {
-        Task Publish(
+        ValueTask Publish(
             TNotification notification,
             IEnumerable<IPanNotificationHandler<TNotification>> handlers,
             CancellationToken cancellationToken

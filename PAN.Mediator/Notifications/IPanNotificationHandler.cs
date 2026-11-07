@@ -6,6 +6,6 @@ namespace PAN.Mediator.Notifications
     public interface IPanNotificationHandler<in TNotification>
         where TNotification : IPanNotification
     {
-        Task Handle(TNotification notification, CancellationToken cancellationToken);
+        ValueTask Handle(TNotification notification, CancellationToken cancellationToken);
     }
 }

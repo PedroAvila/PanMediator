@@ -13,7 +13,7 @@ namespace PAN.Mediator.Notifications
     public sealed class SequentialNotificationPublishStrategy<TNotification> : IPanNotificationPublishStrategy<TNotification>
         where TNotification : IPanNotification
     {
-        public Task Publish(
+        public ValueTask Publish(
             TNotification notification,
             IEnumerable<IPanNotificationHandler<TNotification>> handlers,
             CancellationToken cancellationToken
@@ -23,7 +23,7 @@ namespace PAN.Mediator.Notifications
             {
                 if (list.Count == 0)
                 {
-                    return Task.CompletedTask;
+                    return default;
                 }
 
                 if (list.Count == 1)
@@ -34,7 +34,7 @@ namespace PAN.Mediator.Notifications
                     }
                     catch (Exception ex)
                     {
-                        return Task.FromException(ex);
+                        return new ValueTask(Task.FromException(ex));
                     }
                 }
             }
@@ -42,7 +42,7 @@ namespace PAN.Mediator.Notifications
             return PublishSequential(notification, handlers, cancellationToken);
         }
 
-        private static async Task PublishSequential(
+        private static async ValueTask PublishSequential(
             TNotification notification,
             IEnumerable<IPanNotificationHandler<TNotification>> handlers,
             CancellationToken cancellationToken

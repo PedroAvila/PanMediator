@@ -5,7 +5,7 @@ namespace PAN.Mediator.Core
 {
     internal abstract class PanNotificationHandlerBase
     {
-        public abstract Task Handle(
+        public abstract ValueTask Handle(
             object notification,
             IServiceProvider provider,
             CancellationToken cancellationToken
@@ -19,7 +19,7 @@ namespace PAN.Mediator.Core
         private static readonly IPanNotificationPublishStrategy<TNotification> DefaultStrategy =
             new SequentialNotificationPublishStrategy<TNotification>();
 
-        public override Task Handle(
+        public override ValueTask Handle(
             object notification,
             IServiceProvider provider,
             CancellationToken cancellationToken
@@ -40,8 +40,8 @@ namespace PAN.Mediator.Core
             catch (Exception ex)
             {
                 // Preserve the previous async wrapper's behavior: synchronous failures surface as a
-                // faulted Task instead of throwing from Publish.
-                return Task.FromException(ex);
+                // faulted ValueTask instead of throwing from Publish.
+                return new ValueTask(Task.FromException(ex));
             }
         }
     }

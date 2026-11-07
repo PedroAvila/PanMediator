@@ -10,13 +10,12 @@ public sealed class PanPing : IPanRequest<string>
 
 public sealed class PanPingHandler : IPanRequestHandler<PanPing, string>
 {
-    public Task<string> Handle(PanPing request, CancellationToken cancellationToken) => Task.FromResult("pong");
+    public ValueTask<string> Handle(PanPing request, CancellationToken cancellationToken) => new ValueTask<string>("pong");
 }
 
 public sealed class PanPassThroughBehavior<TRequest, TResponse> : IPanPipelineBehavior<TRequest, TResponse>
-    where TRequest : IPanRequest<TResponse>
 {
-    public Task<TResponse> Handle(
+    public ValueTask<TResponse> Handle(
         TRequest request,
         PanRequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken
@@ -30,7 +29,7 @@ public sealed class PanSingleNotification : IPanNotification
 
 public sealed class PanSingleNotificationHandler : IPanNotificationHandler<PanSingleNotification>
 {
-    public Task Handle(PanSingleNotification notification, CancellationToken cancellationToken) => Task.CompletedTask;
+    public ValueTask Handle(PanSingleNotification notification, CancellationToken cancellationToken) => default;
 }
 
 public sealed class PanThreeNotifications : IPanNotification
@@ -40,15 +39,15 @@ public sealed class PanThreeNotifications : IPanNotification
 
 public sealed class PanThreeNotificationHandler1 : IPanNotificationHandler<PanThreeNotifications>
 {
-    public Task Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => Task.CompletedTask;
+    public ValueTask Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => default;
 }
 
 public sealed class PanThreeNotificationHandler2 : IPanNotificationHandler<PanThreeNotifications>
 {
-    public Task Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => Task.CompletedTask;
+    public ValueTask Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => default;
 }
 
 public sealed class PanThreeNotificationHandler3 : IPanNotificationHandler<PanThreeNotifications>
 {
-    public Task Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => Task.CompletedTask;
+    public ValueTask Handle(PanThreeNotifications notification, CancellationToken cancellationToken) => default;
 }

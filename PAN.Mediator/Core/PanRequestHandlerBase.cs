@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,21 +9,21 @@ namespace PAN.Mediator.Core
 {
     internal abstract class PanRequestHandlerBase
     {
-        public abstract Task<object?> Handle(object request, IServiceProvider provider, CancellationToken cancellationToken);
+        public abstract ValueTask<object?> Handle(object request, IServiceProvider provider, CancellationToken cancellationToken);
     }
 
     internal abstract class PanRequestHandlerWrapper<TResponse> : PanRequestHandlerBase
     {
-        public abstract Task<TResponse> Handle(IPanRequest<TResponse> request, IServiceProvider provider, CancellationToken cancellationToken);
+        public abstract ValueTask<TResponse> Handle(IPanRequest<TResponse> request, IServiceProvider provider, CancellationToken cancellationToken);
     }
 
     internal sealed class PanRequestHandlerWrapperImpl<TRequest, TResponse> : PanRequestHandlerWrapper<TResponse>
         where TRequest : IPanRequest<TResponse>
     {
-        public override async Task<object?> Handle(object request, IServiceProvider provider, CancellationToken cancellationToken)
+        public override async ValueTask<object?> Handle(object request, IServiceProvider provider, CancellationToken cancellationToken)
             => await Handle((IPanRequest<TResponse>)request, provider, cancellationToken).ConfigureAwait(false);
 
-        public override Task<TResponse> Handle(IPanRequest<TResponse> request, IServiceProvider provider, CancellationToken cancellationToken)
+        public override ValueTask<TResponse> Handle(IPanRequest<TResponse> request, IServiceProvider provider, CancellationToken cancellationToken)
         {
             var typedRequest = (TRequest)request;
 

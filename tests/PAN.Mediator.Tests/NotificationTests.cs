@@ -70,7 +70,7 @@ namespace PAN.Mediator.Tests
             var mediator = provider.GetRequiredService<IPanMediator>();
 
             var notification = new ProbeNotification();
-            var actualException = await Assert.ThrowsAsync<InvalidOperationException>(() => mediator.Publish(notification));
+            var actualException = await Assert.ThrowsAsync<InvalidOperationException>(() => mediator.Publish(notification).AsTask());
 
             Assert.Same(expectedException, actualException);
             await secondHandler.DidNotReceive().Handle(Arg.Any<ProbeNotification>(), Arg.Any<CancellationToken>());

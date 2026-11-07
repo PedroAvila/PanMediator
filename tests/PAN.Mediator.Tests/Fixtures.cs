@@ -14,8 +14,8 @@ namespace PAN.Mediator.Tests
 
     public sealed class PingRequestHandler : IPanRequestHandler<PingRequest, string>
     {
-        public Task<string> Handle(PingRequest request, CancellationToken cancellationToken)
-            => Task.FromResult($"Pong: {request.Message}");
+        public ValueTask<string> Handle(PingRequest request, CancellationToken cancellationToken)
+            => new ValueTask<string>($"Pong: {request.Message}");
     }
 
     public sealed class VoidRequest : IPanRequest
@@ -24,8 +24,8 @@ namespace PAN.Mediator.Tests
 
     public sealed class VoidRequestHandler : IPanRequestHandler<VoidRequest>
     {
-        public Task<Unit> Handle(VoidRequest request, CancellationToken cancellationToken)
-            => Unit.Task;
+        public ValueTask<Unit> Handle(VoidRequest request, CancellationToken cancellationToken)
+            => Unit.CompletedValueTask;
     }
 
     public sealed class PingNotification : IPanNotification
@@ -35,12 +35,12 @@ namespace PAN.Mediator.Tests
 
     public sealed class PingNotificationHandlerOne : IPanNotificationHandler<PingNotification>
     {
-        public Task Handle(PingNotification notification, CancellationToken cancellationToken) => Task.CompletedTask;
+        public ValueTask Handle(PingNotification notification, CancellationToken cancellationToken) => default;
     }
 
     public sealed class PingNotificationHandlerTwo : IPanNotificationHandler<PingNotification>
     {
-        public Task Handle(PingNotification notification, CancellationToken cancellationToken) => Task.CompletedTask;
+        public ValueTask Handle(PingNotification notification, CancellationToken cancellationToken) => default;
     }
 
     public sealed class CallRecorder
@@ -55,7 +55,7 @@ namespace PAN.Mediator.Tests
 
         public RecordingBehaviorA(CallRecorder recorder) => _recorder = recorder;
 
-        public async Task<TResponse> Handle(TRequest request, PanRequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> Handle(TRequest request, PanRequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             _recorder.Calls.Add("A-before");
             var response = await next();
@@ -71,7 +71,7 @@ namespace PAN.Mediator.Tests
 
         public RecordingBehaviorB(CallRecorder recorder) => _recorder = recorder;
 
-        public async Task<TResponse> Handle(TRequest request, PanRequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> Handle(TRequest request, PanRequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             _recorder.Calls.Add("B-before");
             var response = await next();
@@ -82,8 +82,8 @@ namespace PAN.Mediator.Tests
 
     public sealed class ShortCircuitBehavior : IPanPipelineBehavior<PingRequest, string>
     {
-        public Task<string> Handle(PingRequest request, PanRequestHandlerDelegate<string> next, CancellationToken cancellationToken)
-            => Task.FromResult("short-circuited");
+        public ValueTask<string> Handle(PingRequest request, PanRequestHandlerDelegate<string> next, CancellationToken cancellationToken)
+            => new ValueTask<string>("short-circuited");
     }
 
     // Separate from PingNotification so these fixtures (which need constructor args HandlerRegistrar's
@@ -98,7 +98,7 @@ namespace PAN.Mediator.Tests
 
         public ThrowingNotificationHandler(Exception exception) => _exception = exception;
 
-        public Task Handle(ProbeNotification notification, CancellationToken cancellationToken) => throw _exception;
+        public ValueTask Handle(ProbeNotification notification, CancellationToken cancellationToken) => throw _exception;
     }
 
     public sealed class ConcurrencyTracker
@@ -143,7 +143,7 @@ namespace PAN.Mediator.Tests
             _delay = delay;
         }
 
-        public async Task Handle(ProbeNotification notification, CancellationToken cancellationToken)
+        public async ValueTask Handle(ProbeNotification notification, CancellationToken cancellationToken)
         {
             using (_tracker.Enter())
             {
@@ -159,7 +159,7 @@ namespace PAN.Mediator.Tests
 
         public RecordingNotificationPublishStrategy(CallRecorder recorder) => _recorder = recorder;
 
-        public async Task Publish(TNotification notification, IEnumerable<IPanNotificationHandler<TNotification>> handlers, CancellationToken cancellationToken)
+        public async ValueTask Publish(TNotification notification, IEnumerable<IPanNotificationHandler<TNotification>> handlers, CancellationToken cancellationToken)
         {
             _recorder.Calls.Add("strategy-invoked");
             foreach (var handler in handlers)

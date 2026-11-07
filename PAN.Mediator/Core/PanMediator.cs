@@ -17,7 +17,7 @@ namespace PAN.Mediator.Core
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public Task<TResponse> Send<TResponse>(IPanRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public ValueTask<TResponse> Send<TResponse>(IPanRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -31,7 +31,7 @@ namespace PAN.Mediator.Core
             return wrapper.Handle(request, _provider, cancellationToken);
         }
 
-        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        public ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : IPanNotification
         {
             if (notification is null) throw new ArgumentNullException(nameof(notification));
