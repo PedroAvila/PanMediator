@@ -51,6 +51,8 @@ dotnet add package PAN.Mediator
 - .NET SDK compatible with `netstandard2.0`, `net6.0`, or `net8.0`.
 - `Microsoft.Extensions.DependencyInjection` (or any container compatible with `IServiceProvider`).
 
+The `netstandard2.0` build can be consumed from .NET Framework — see [WebApiMediator](https://github.com/PedroAvila/WebApiMediator) for a working Web API sample targeting .NET Framework.
+
 ## Quick start
 
 ### 1. Register the mediator
